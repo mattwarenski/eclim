@@ -193,6 +193,11 @@ endif
 if !exists(":JavaRename")
   command -nargs=1 -buffer JavaRename :call eclim#java#refactor#Rename('<args>')
 endif
+
+if !exists(":JavaExtractMethod")
+  command -nargs=1 -buffer JavaExtractMethod :call eclim#java#refactor#ExtractMethod('<args>')
+endif
+
 if !exists(":JavaMove")
   command -nargs=1 -buffer -complete=customlist,eclim#java#util#CommandCompletePackage
     \ JavaMove :call eclim#java#refactor#Move('<args>')

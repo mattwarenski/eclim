@@ -322,6 +322,17 @@ function! eclim#util#GetCurrentElementPosition()
   return offset . ";" . strlen(word)
 endfunction " }}}
 
+" GetVisualLength {{{
+"Gets the length of the current visual selection
+function! eclim#util#GetVisualLength()
+  let lines = getline(line("'<"),line("'>"))
+  let length = 0
+  for line in lines
+    let length = length + strlen(line)
+  endfor
+  return length
+endfunction " }}}
+
 " GetCurrentElementOffset() {{{
 " Gets the byte offset for the element under the cursor.
 function! eclim#util#GetCurrentElementOffset()

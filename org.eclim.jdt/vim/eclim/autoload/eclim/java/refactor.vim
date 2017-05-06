@@ -24,7 +24,47 @@
     \ '-p "<project>" -f "<file>" -o <offset> -e <encoding> -l <length> -n <name>'
   let s:command_move = '-command java_refactor_move ' .
     \ '-p "<project>" -f "<file>" -n <package>'
+  let s:command_extract_method = '-command java_refactor_extract_method ' .
+    \ '-p "<project>" -f "<file>" -n <name> -e <encoding> -o <offset> -l <length>'
 " }}}
+function! eclim#java#refactor#ExtractMethod(name) " {{{
+  if !eclim#project#util#IsCurrentFileInProject()
+    return
+  endif
+
+  let prompt = printf('ExtractMethod "%s"', a:name)
+  let result = exists('g:EclimRefactorPromptDefault') ?
+    \ g:EclimRefactorPromptDefault : eclim#lang#RefactorPrompt(prompt)
+  if result <= 0
+    return
+  endif
+
+  " update the file before vim makes any changes.
+  call eclim#lang#SilentUpdate()
+  wall
+
+  let project = eclim#project#util#GetCurrentProjectName()
+  let file = eclim#project#util#GetProjectRelativeFilePath()
+  let offset = eclim#util#GetCurrentElementOffset()
+  let length = eclim#util#GetVisualLength()
+
+  let command = s:command_extract_method
+  let command = substitute(command, '<project>', project, '')
+  let command = substitute(command, '<file>', file, '')
+  let command = substitute(command, '<offset>', offset, '')
+  let command = substitute(command, '<length>', length, '')
+  let command = substitute(command, '<encoding>', eclim#util#GetEncoding(), '')
+  let command = substitute(command, '<name>', a:name, '')
+  " user chose preview at the prompt
+  if result == 2
+    let command .= ' -v'
+    call eclim#lang#RefactorPreview(command)
+    return
+  endif
+  echo command
+
+  call eclim#lang#Refactor(command)
+endfunction " }}}
 
 function! eclim#java#refactor#Rename(name) " {{{
   if !eclim#project#util#IsCurrentFileInProject()
